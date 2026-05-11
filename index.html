@@ -1,54 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Weather App</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 </head>
 
 <body>
 
-  <!-- Moving Clouds -->
-  <div class="clouds"></div>
+    <!-- Background Overlay -->
+    <div class="overlay"></div>
 
-  <!-- Dark Mode Toggle -->
-  <button id="theme-toggle">🌙</button>
+    <!-- Moving Clouds -->
+    <div class="clouds"></div>
 
-  <!-- Main App -->
-  <div class="app-main">
+    <!-- Dark Mode -->
+    <button id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
 
-    <div class="header">
-      <h1>🌤 Weather App</h1>
+    <!-- Main Weather Card -->
+    <div class="app-main">
+
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-cloud-sun"></i> Weather App</h1>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <input
+                type="text"
+                id="input-box"
+                class="input-box"
+                placeholder="Search city..."
+                autocomplete="off">
+        </div>
+
+        <!-- Weather Body -->
+        <div class="weather-body" id="weather-body"></div>
+
     </div>
 
-    <div class="search-box">
-      <input
-        type="text"
-        id="input-box"
-        class="input-box"
-        placeholder="Enter city name..."
-        autocomplete="off"
-      />
-    </div>
+    <!-- Sweet Alert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <div class="weather-body" id="weather-body">
-      <!-- Weather Data -->
-    </div>
-
-  </div>
-
-  <!-- Sweet Alert -->
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-  <!-- JavaScript -->
-  <script src="script.js"></script>
+    <!-- JS -->
+    <script src="script.js"></script>
 
 </body>
+
 </html>
