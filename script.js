@@ -5,36 +5,56 @@ const weatherApi = {
 
 let inputBox = document.getElementById("input-box");
 
-/* SEARCH */
+/* Search */
 inputBox.addEventListener("keypress", (event) => {
-    if (event.key === "Enter") {
-        getWeatherReport(inputBox.value.trim());
+
+    if(event.key === "Enter"){
+
+        getWeather(inputBox.value.trim());
+
     }
+
 });
 
-/* FETCH WEATHER */
-function getWeatherReport(city) {
+/* Fetch Weather */
+function getWeather(city){
 
-    if (!city) {
-        swal("Empty Input", "Please enter city name", "error");
+    if(city === ""){
+
+        swal("Empty Input","Please enter city name","error");
+
         return;
     }
 
     fetch(`${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
-        .then(response => response.json())
-        .then(showWeatherReport)
-        .catch(() => {
-            swal("Error", "Something went wrong", "error");
-        });
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.cod != 200){
+
+            swal("Error",data.message,"error");
+
+            return;
+        }
+
+        showWeather(data);
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        swal("Error","Unable to fetch weather","error");
+
+    });
+
 }
 
-/* SHOW WEATHER */
-function showWeatherReport(weather) {
-
-    if (weather.cod == 404) {
-        swal("City Not Found", "Please enter valid city", "warning");
-        return;
-    }
+/* Show Weather */
+function showWeather(weather){
 
     let weatherBody = document.getElementById("weather-body");
 
@@ -58,31 +78,51 @@ function showWeatherReport(weather) {
 
         <div class="weather">
             ${weather.weather[0].main}
-            <i class="${getIconClass(weather.weather[0].main)}"></i>
+            <i class="${getWeatherIcon(weather.weather[0].main)}"></i>
         </div>
 
         <div class="min-max">
-            ${Math.floor(weather.main.temp_min)}°C (min) /
+            ${Math.floor(weather.main.temp_min)}°C (min)
+            /
             ${Math.ceil(weather.main.temp_max)}°C (max)
         </div>
 
-        <div class="basic">
-            Feels like ${weather.main.feels_like}°C |
-            Humidity ${weather.main.humidity}% <br>
-            Pressure ${weather.main.pressure} mb |
-            Wind ${weather.wind.speed} km/h
+        <div class="details">
+
+            <div class="card">
+                <i class="fas fa-temperature-high"></i>
+                <h4>Feels Like</h4>
+                <p>${weather.main.feels_like}°C</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-tint"></i>
+                <h4>Humidity</h4>
+                <p>${weather.main.humidity}%</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-gauge-high"></i>
+                <h4>Pressure</h4>
+                <p>${weather.main.pressure} mb</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-wind"></i>
+                <h4>Wind</h4>
+                <p>${weather.wind.speed} km/h</p>
+            </div>
+
         </div>
 
     `;
 
-    changeBg(weather.weather[0].main);
-    toggleClouds(weather.weather[0].main);
+    changeBackground(weather.weather[0].main);
 
-    inputBox.value = "";
 }
 
-/* DATE */
-function dateManage(dateArg) {
+/* Date */
+function dateManage(dateArg){
 
     let days = [
         "Sunday","Monday","Tuesday",
@@ -96,104 +136,80 @@ function dateManage(dateArg) {
     ];
 
     let day = days[dateArg.getDay()];
+
     let month = months[dateArg.getMonth()];
+
     let date = dateArg.getDate();
+
     let year = dateArg.getFullYear();
 
-    return `${date} ${month} (${day}), ${year}`;
+    return `${day}, ${date} ${month} ${year}`;
 }
 
-/* ICONS */
-function getIconClass(weatherType) {
+/* Icons */
+function getWeatherIcon(type){
 
-    if (weatherType === "Clear")
+    if(type === "Clear")
         return "fas fa-sun";
 
-    else if (weatherType === "Clouds")
+    else if(type === "Clouds")
         return "fas fa-cloud";
 
-    else if (weatherType === "Rain")
+    else if(type === "Rain")
         return "fas fa-cloud-showers-heavy";
 
-    else if (weatherType === "Snow")
+    else if(type === "Snow")
         return "fas fa-snowflake";
 
-    else if (weatherType === "Thunderstorm")
+    else if(type === "Thunderstorm")
         return "fas fa-bolt";
-
-    else if (weatherType === "Mist")
-        return "fas fa-smog";
 
     else
         return "fas fa-cloud-sun";
 }
 
-/* DYNAMIC BACKGROUND */
-function changeBg(status) {
+/* Dynamic Background */
+function changeBackground(status){
 
     let body = document.body;
 
-    if (status === "Clear") {
+    if(status === "Clear"){
 
         body.style.background =
-            "linear-gradient(135deg,#fceabb,#f8b500)";
-
+        "linear-gradient(180deg,#0f2027,#2c5364,#4facfe)";
     }
 
-    else if (status === "Clouds") {
+    else if(status === "Clouds"){
 
         body.style.background =
-            "linear-gradient(135deg,#bdc3c7,#2c3e50)";
-
+        "linear-gradient(180deg,#757f9a,#d7dde8)";
     }
 
-    else if (status === "Rain") {
+    else if(status === "Rain"){
 
         body.style.background =
-            "linear-gradient(135deg,#4b79a1,#283e51)";
-
+        "linear-gradient(180deg,#314755,#26a0da)";
     }
 
-    else if (status === "Snow") {
+    else if(status === "Snow"){
 
         body.style.background =
-            "linear-gradient(135deg,#e6dada,#274046)";
-
+        "linear-gradient(180deg,#83a4d4,#b6fbff)";
     }
 
-    else if (status === "Thunderstorm") {
+    else{
 
         body.style.background =
-            "linear-gradient(135deg,#141e30,#243b55)";
-
+        "linear-gradient(180deg,#162a72,#3f2b96,#8e54e9)";
     }
 
-    else {
-
-        body.style.background =
-            "linear-gradient(135deg,#667eea,#764ba2)";
-    }
 }
 
-/* CLOUD CONTROL */
-function toggleClouds(status) {
-
-    let clouds = document.querySelector(".clouds");
-
-    if (status === "Clouds" || status === "Mist") {
-        clouds.style.display = "block";
-    }
-
-    else {
-        clouds.style.display = "none";
-    }
-}
-
-/* DARK MODE */
+/* Dark Mode */
 document
-    .getElementById("theme-toggle")
-    .addEventListener("click", () => {
+.getElementById("theme-toggle")
+.addEventListener("click",()=>{
 
-        document.body.classList.toggle("dark");
+    document.body.classList.toggle("dark");
 
 });
