@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+
+<body>
+
+  <!-- Moving Clouds -->
+  <div class="clouds"></div>
+
+  <!-- Dark Mode Toggle -->
+  <button id="theme-toggle">🌙</button>
+
+  <!-- Main App -->
+  <div class="app-main">
+
+    <div class="header">
+      <h1>🌤 Weather App</h1>
+    </div>
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="input-box"
+        class="input-box"
+        placeholder="Enter city name..."
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="weather-body" id="weather-body">
+      <!-- Weather Data -->
+    </div>
+
+  </div>
+
+  <!-- Sweet Alert -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+
+</body>
+</html>
