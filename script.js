@@ -1,383 +1,251 @@
-const weatherApi = {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    key: "df7dcacdc4ca9073762c2b558f681943",
-
-    baseUrl:
-    "https://api.openweathermap.org/data/2.5/weather"
-};
-
-let inputBox =
-document.getElementById("input-box");
-
-/* Search */
-inputBox.addEventListener("keypress",(event)=>{
-
-    if(event.key === "Enter"){
-
-        getWeather(inputBox.value.trim());
-
-    }
-
-});
-
-/* Current Weather */
-function getWeather(city){
-
-    if(city === ""){
-
-        swal(
-            "Empty Input",
-            "Please enter city",
-            "error"
-        );
-
-        return;
-    }
-
-    fetch(
-        `${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`
-    )
-
-    .then(response=>response.json())
-
-    .then(data=>{
-
-        if(data.cod != 200){
-
-            swal(
-                "Error",
-                data.message,
-                "error"
-            );
-
-            return;
-        }
-
-        showWeather(data);
-
-        getForecast(city);
-
-    })
-
-    .catch(()=>{
-
-        swal(
-            "Error",
-            "Unable to fetch weather",
-            "error"
-        );
-
-    });
-
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* Show Weather */
-function showWeather(weather){
+body{
 
-    let weatherBody =
-    document.getElementById("weather-body");
+    font-family:'Poppins',sans-serif;
 
-    weatherBody.style.display = "block";
+    min-height:100vh;
 
-    weatherBody.innerHTML = `
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-        <div class="city">
-            ${weather.name}, ${weather.sys.country}
-        </div>
+    overflow:hidden;
 
-        <div class="date">
-            ${new Date().toDateString()}
-        </div>
+    background:url("images/clear.jpg");
 
-        <div class="temp">
-            ${Math.round(weather.main.temp)}°C
-        </div>
+    background-size:cover;
+    background-position:center;
 
-        <div class="weather">
-            ${weather.weather[0].main}
-            <i class="${getWeatherIcon(
-                weather.weather[0].main
-            )}"></i>
-        </div>
+    position:relative;
 
-        <div class="min-max">
-            ${Math.floor(weather.main.temp_min)}°C
-            /
-            ${Math.ceil(weather.main.temp_max)}°C
-        </div>
+    transition:0.5s;
+}
 
-        <div class="details">
+/* Overlay */
+.overlay{
 
-            <div class="card">
-                <h4>Humidity</h4>
-                <p>${weather.main.humidity}%</p>
-            </div>
+    position:absolute;
 
-            <div class="card">
-                <h4>Wind</h4>
-                <p>${weather.wind.speed} km/h</p>
-            </div>
+    width:100%;
+    height:100%;
 
-            <div class="card">
-                <h4>Pressure</h4>
-                <p>${weather.main.pressure} mb</p>
-            </div>
+    background:rgba(0,0,0,0.35);
 
-            <div class="card">
-                <h4>Feels Like</h4>
-                <p>${weather.main.feels_like}°C</p>
-            </div>
+    z-index:0;
+}
 
-        </div>
-    `;
+/* Clouds */
+.clouds{
 
-    changeBackground(
-        weather.weather[0].main
-    );
+    position:absolute;
 
-    if(weather.weather[0].main === "Rain"){
+    width:200%;
+    height:100%;
 
-        createRain();
+    background:url("https://i.ibb.co/7rZz1kS/clouds.png")
+    repeat-x;
 
+    opacity:0.12;
+
+    animation:moveClouds 80s linear infinite;
+
+    z-index:1;
+}
+
+@keyframes moveClouds{
+
+    from{
+        transform:translateX(0);
     }
 
+    to{
+        transform:translateX(-50%);
+    }
+}
+
+/* App Card */
+.app-main{
+
+    position:relative;
+
+    z-index:5;
+
+    width:95%;
+    max-width:430px;
+
+    padding:30px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.15);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,0.2);
+
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);
+
+    color:white;
+
+    text-align:center;
+}
+
+/* Header */
+.header h1{
+
+    font-size:2rem;
+
+    margin-bottom:25px;
+}
+
+/* Input */
+.input-box{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+    outline:none;
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,0.15);
+
+    color:white;
+
+    font-size:1rem;
+
+    text-align:center;
+}
+
+.input-box::placeholder{
+    color:#eee;
+}
+
+/* Weather */
+.weather-body{
+
+    display:none;
+
+    margin-top:20px;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    background:rgba(0,0,0,0.2);
+}
+
+/* City */
+.city{
+
+    font-size:2rem;
+
+    font-weight:600;
+}
+
+/* Temp */
+.temp{
+
+    font-size:5rem;
+
+    margin:20px 0;
+}
+
+/* Details */
+.details{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:15px;
+
+    margin-top:20px;
+}
+
+.card{
+
+    background:rgba(255,255,255,0.1);
+
+    padding:15px;
+
+    border-radius:15px;
 }
 
 /* Forecast */
-function getForecast(city){
+.forecast{
 
-    fetch(
-    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${weatherApi.key}&units=metric`
-    )
+    margin-top:20px;
 
-    .then(response=>response.json())
+    display:grid;
 
-    .then(data=>{
+    grid-template-columns:repeat(5,1fr);
 
-        showForecast(data);
-
-        showChart(data);
-
-    });
-
+    gap:10px;
 }
 
-/* Show Forecast */
-function showForecast(data){
+.forecast-card{
 
-    let forecast =
-    document.getElementById("forecast");
+    background:rgba(255,255,255,0.12);
 
-    forecast.innerHTML = "";
+    padding:10px;
 
-    let filtered =
-    data.list.filter(item=>
-        item.dt_txt.includes("12:00:00")
-    );
-
-    filtered.forEach(item=>{
-
-        let date =
-        new Date(item.dt_txt);
-
-        let day =
-        date.toLocaleDateString(
-            "en-US",
-            {weekday:"short"}
-        );
-
-        forecast.innerHTML += `
-
-            <div class="forecast-card">
-
-                <h4>${day}</h4>
-
-                <p>
-                    ${Math.round(item.main.temp)}°C
-                </p>
-
-                <small>
-                    ${item.weather[0].main}
-                </small>
-
-            </div>
-
-        `;
-
-    });
-
+    border-radius:15px;
 }
 
 /* Chart */
-function showChart(data){
+#weatherChart{
 
-    let ctx =
-    document.getElementById("weatherChart");
+    margin-top:20px;
 
-    let labels = [];
+    background:rgba(255,255,255,0.08);
 
-    let temps = [];
+    border-radius:20px;
 
-    data.list.slice(0,8).forEach(item=>{
-
-        labels.push(
-            item.dt_txt
-            .split(" ")[1]
-            .slice(0,5)
-        );
-
-        temps.push(item.main.temp);
-
-    });
-
-    if(window.weatherChartInstance){
-
-        window.weatherChartInstance.destroy();
-
-    }
-
-    window.weatherChartInstance =
-    new Chart(ctx,{
-
-        type:"line",
-
-        data:{
-
-            labels:labels,
-
-            datasets:[{
-
-                label:"Temperature °C",
-
-                data:temps,
-
-                borderColor:"#ffffff",
-
-                backgroundColor:
-                "rgba(255,255,255,0.15)",
-
-                fill:true,
-
-                tension:0.4
-
-            }]
-        },
-
-        options:{
-
-            responsive:true,
-
-            plugins:{
-
-                legend:{
-                    labels:{
-                        color:"white"
-                    }
-                }
-            },
-
-            scales:{
-
-                x:{
-                    ticks:{
-                        color:"white"
-                    }
-                },
-
-                y:{
-                    ticks:{
-                        color:"white"
-                    }
-                }
-            }
-        }
-
-    });
-
+    padding:10px;
 }
 
-/* Rain */
-function createRain(){
+/* Toggle */
+#theme-toggle{
 
-    let rain =
-    document.getElementById("rain");
+    position:absolute;
 
-    rain.innerHTML = "";
+    top:20px;
+    right:20px;
 
-    for(let i=0;i<100;i++){
+    width:45px;
+    height:45px;
 
-        let drop =
-        document.createElement("div");
+    border:none;
 
-        drop.classList.add("drop");
+    border-radius:50%;
 
-        drop.style.left =
-        Math.random()*100 + "vw";
+    background:rgba(255,255,255,0.15);
 
-        drop.style.animationDuration =
-        Math.random()*1 + 0.5 + "s";
+    color:white;
 
-        rain.appendChild(drop);
+    cursor:pointer;
 
-    }
-
+    z-index:10;
 }
 
-/* Icons */
-function getWeatherIcon(type){
+/* Mobile */
+@media(max-width:700px){
 
-    if(type === "Clear")
-        return "fas fa-sun";
+    .forecast{
+        grid-template-columns:repeat(2,1fr);
+    }
 
-    else if(type === "Clouds")
-        return "fas fa-cloud";
-
-    else if(type === "Rain")
-        return "fas fa-cloud-showers-heavy";
-
-    else if(type === "Snow")
-        return "fas fa-snowflake";
-
-    else
-        return "fas fa-cloud-sun";
+    .temp{
+        font-size:4rem;
+    }
 }
-
-/* Background */
-function changeBackground(status){
-
-    let body = document.body;
-
-    if(status === "Clear"){
-
-        body.style.background =
-        "linear-gradient(180deg,#0f2027,#2c5364,#4facfe)";
-    }
-
-    else if(status === "Clouds"){
-
-        body.style.background =
-        "linear-gradient(180deg,#757f9a,#d7dde8)";
-    }
-
-    else if(status === "Rain"){
-
-        body.style.background =
-        "linear-gradient(180deg,#314755,#26a0da)";
-    }
-
-    else{
-
-        body.style.background =
-        "linear-gradient(180deg,#162a72,#3f2b96,#8e54e9)";
-    }
-
-}
-
-/* Dark Mode */
-document
-.getElementById("theme-toggle")
-.addEventListener("click",()=>{
-
-    document.body.classList.toggle("dark");
-
-});
