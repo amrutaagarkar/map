@@ -1,12 +1,16 @@
 const weatherApi = {
+
     key: "df7dcacdc4ca9073762c2b558f681943",
-    baseUrl: "https://api.openweathermap.org/data/2.5/weather"
+
+    baseUrl:
+    "https://api.openweathermap.org/data/2.5/weather"
 };
 
-let inputBox = document.getElementById("input-box");
+let inputBox =
+document.getElementById("input-box");
 
 /* Search */
-inputBox.addEventListener("keypress", (event) => {
+inputBox.addEventListener("keypress",(event)=>{
 
     if(event.key === "Enter"){
 
@@ -16,38 +20,52 @@ inputBox.addEventListener("keypress", (event) => {
 
 });
 
-/* Fetch Weather */
+/* Current Weather */
 function getWeather(city){
 
     if(city === ""){
 
-        swal("Empty Input","Please enter city name","error");
+        swal(
+            "Empty Input",
+            "Please enter city",
+            "error"
+        );
 
         return;
     }
 
-    fetch(`${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
+    fetch(
+        `${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`
+    )
 
-    .then(response => response.json())
+    .then(response=>response.json())
 
-    .then(data => {
+    .then(data=>{
 
         if(data.cod != 200){
 
-            swal("Error",data.message,"error");
+            swal(
+                "Error",
+                data.message,
+                "error"
+            );
 
             return;
         }
 
         showWeather(data);
 
+        getForecast(city);
+
     })
 
-    .catch(error => {
+    .catch(()=>{
 
-        console.log(error);
-
-        swal("Error","Unable to fetch weather","error");
+        swal(
+            "Error",
+            "Unable to fetch weather",
+            "error"
+        );
 
     });
 
@@ -56,11 +74,10 @@ function getWeather(city){
 /* Show Weather */
 function showWeather(weather){
 
-    let weatherBody = document.getElementById("weather-body");
+    let weatherBody =
+    document.getElementById("weather-body");
 
     weatherBody.style.display = "block";
-
-    let todayDate = new Date();
 
     weatherBody.innerHTML = `
 
@@ -69,7 +86,7 @@ function showWeather(weather){
         </div>
 
         <div class="date">
-            ${dateManage(todayDate)}
+            ${new Date().toDateString()}
         </div>
 
         <div class="temp">
@@ -78,72 +95,232 @@ function showWeather(weather){
 
         <div class="weather">
             ${weather.weather[0].main}
-            <i class="${getWeatherIcon(weather.weather[0].main)}"></i>
+            <i class="${getWeatherIcon(
+                weather.weather[0].main
+            )}"></i>
         </div>
 
         <div class="min-max">
-            ${Math.floor(weather.main.temp_min)}°C (min)
+            ${Math.floor(weather.main.temp_min)}°C
             /
-            ${Math.ceil(weather.main.temp_max)}°C (max)
+            ${Math.ceil(weather.main.temp_max)}°C
         </div>
 
         <div class="details">
 
             <div class="card">
-                <i class="fas fa-temperature-high"></i>
-                <h4>Feels Like</h4>
-                <p>${weather.main.feels_like}°C</p>
-            </div>
-
-            <div class="card">
-                <i class="fas fa-tint"></i>
                 <h4>Humidity</h4>
                 <p>${weather.main.humidity}%</p>
             </div>
 
             <div class="card">
-                <i class="fas fa-gauge-high"></i>
+                <h4>Wind</h4>
+                <p>${weather.wind.speed} km/h</p>
+            </div>
+
+            <div class="card">
                 <h4>Pressure</h4>
                 <p>${weather.main.pressure} mb</p>
             </div>
 
             <div class="card">
-                <i class="fas fa-wind"></i>
-                <h4>Wind</h4>
-                <p>${weather.wind.speed} km/h</p>
+                <h4>Feels Like</h4>
+                <p>${weather.main.feels_like}°C</p>
             </div>
 
         </div>
-
     `;
 
-    changeBackground(weather.weather[0].main);
+    changeBackground(
+        weather.weather[0].main
+    );
+
+    if(weather.weather[0].main === "Rain"){
+
+        createRain();
+
+    }
 
 }
 
-/* Date */
-function dateManage(dateArg){
+/* Forecast */
+function getForecast(city){
 
-    let days = [
-        "Sunday","Monday","Tuesday",
-        "Wednesday","Thursday","Friday","Saturday"
-    ];
+    fetch(
+    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${weatherApi.key}&units=metric`
+    )
 
-    let months = [
-        "January","February","March","April",
-        "May","June","July","August",
-        "September","October","November","December"
-    ];
+    .then(response=>response.json())
 
-    let day = days[dateArg.getDay()];
+    .then(data=>{
 
-    let month = months[dateArg.getMonth()];
+        showForecast(data);
 
-    let date = dateArg.getDate();
+        showChart(data);
 
-    let year = dateArg.getFullYear();
+    });
 
-    return `${day}, ${date} ${month} ${year}`;
+}
+
+/* Show Forecast */
+function showForecast(data){
+
+    let forecast =
+    document.getElementById("forecast");
+
+    forecast.innerHTML = "";
+
+    let filtered =
+    data.list.filter(item=>
+        item.dt_txt.includes("12:00:00")
+    );
+
+    filtered.forEach(item=>{
+
+        let date =
+        new Date(item.dt_txt);
+
+        let day =
+        date.toLocaleDateString(
+            "en-US",
+            {weekday:"short"}
+        );
+
+        forecast.innerHTML += `
+
+            <div class="forecast-card">
+
+                <h4>${day}</h4>
+
+                <p>
+                    ${Math.round(item.main.temp)}°C
+                </p>
+
+                <small>
+                    ${item.weather[0].main}
+                </small>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+/* Chart */
+function showChart(data){
+
+    let ctx =
+    document.getElementById("weatherChart");
+
+    let labels = [];
+
+    let temps = [];
+
+    data.list.slice(0,8).forEach(item=>{
+
+        labels.push(
+            item.dt_txt
+            .split(" ")[1]
+            .slice(0,5)
+        );
+
+        temps.push(item.main.temp);
+
+    });
+
+    if(window.weatherChartInstance){
+
+        window.weatherChartInstance.destroy();
+
+    }
+
+    window.weatherChartInstance =
+    new Chart(ctx,{
+
+        type:"line",
+
+        data:{
+
+            labels:labels,
+
+            datasets:[{
+
+                label:"Temperature °C",
+
+                data:temps,
+
+                borderColor:"#ffffff",
+
+                backgroundColor:
+                "rgba(255,255,255,0.15)",
+
+                fill:true,
+
+                tension:0.4
+
+            }]
+        },
+
+        options:{
+
+            responsive:true,
+
+            plugins:{
+
+                legend:{
+                    labels:{
+                        color:"white"
+                    }
+                }
+            },
+
+            scales:{
+
+                x:{
+                    ticks:{
+                        color:"white"
+                    }
+                },
+
+                y:{
+                    ticks:{
+                        color:"white"
+                    }
+                }
+            }
+        }
+
+    });
+
+}
+
+/* Rain */
+function createRain(){
+
+    let rain =
+    document.getElementById("rain");
+
+    rain.innerHTML = "";
+
+    for(let i=0;i<100;i++){
+
+        let drop =
+        document.createElement("div");
+
+        drop.classList.add("drop");
+
+        drop.style.left =
+        Math.random()*100 + "vw";
+
+        drop.style.animationDuration =
+        Math.random()*1 + 0.5 + "s";
+
+        rain.appendChild(drop);
+
+    }
+
 }
 
 /* Icons */
@@ -161,14 +338,11 @@ function getWeatherIcon(type){
     else if(type === "Snow")
         return "fas fa-snowflake";
 
-    else if(type === "Thunderstorm")
-        return "fas fa-bolt";
-
     else
         return "fas fa-cloud-sun";
 }
 
-/* Dynamic Background */
+/* Background */
 function changeBackground(status){
 
     let body = document.body;
@@ -189,12 +363,6 @@ function changeBackground(status){
 
         body.style.background =
         "linear-gradient(180deg,#314755,#26a0da)";
-    }
-
-    else if(status === "Snow"){
-
-        body.style.background =
-        "linear-gradient(180deg,#83a4d4,#b6fbff)";
     }
 
     else{
