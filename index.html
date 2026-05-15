@@ -6,12 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Advanced Weather App</title>
+    <title>Weather App</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
 
     <!-- Font Awesome -->
@@ -22,21 +20,14 @@
 
 <body>
 
-    <!-- Overlay -->
     <div class="overlay"></div>
 
-    <!-- Clouds -->
     <div class="clouds"></div>
 
-    <!-- Rain -->
-    <div class="rain" id="rain"></div>
-
-    <!-- Dark Mode -->
     <button id="theme-toggle">
         <i class="fas fa-moon"></i>
     </button>
 
-    <!-- App -->
     <div class="app-main">
 
         <div class="header">
@@ -46,36 +37,30 @@
             </h1>
         </div>
 
-        <!-- Search -->
         <div class="search-box">
 
             <input
                 type="text"
                 id="input-box"
                 class="input-box"
-                placeholder="Search city..."
-                autocomplete="off">
+                placeholder="Search city...">
 
         </div>
 
-        <!-- Weather -->
         <div class="weather-body" id="weather-body"></div>
 
-        <!-- Forecast -->
         <div class="forecast" id="forecast"></div>
 
-        <!-- Chart -->
         <canvas id="weatherChart"></canvas>
 
     </div>
 
-    <!-- Alert -->
+    <!-- Sweet Alert -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <!-- Chart JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- JS -->
     <script src="script.js"></script>
 
 </body>
