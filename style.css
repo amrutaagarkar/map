@@ -16,7 +16,7 @@ body{
     justify-content:center;
     align-items:center;
 
-    overflow:hidden;
+    overflow-x:hidden;
 
     background:
     linear-gradient(
@@ -26,12 +26,12 @@ body{
         #8e54e9 100%
     );
 
-    position:relative;
-
     transition:0.5s ease;
+
+    position:relative;
 }
 
-/* Overlay Glow */
+/* Overlay */
 .overlay{
 
     position:absolute;
@@ -42,14 +42,14 @@ body{
     background:
     radial-gradient(
         circle at center,
-        rgba(255,255,255,0.1),
+        rgba(255,255,255,0.08),
         transparent 60%
     );
 
     z-index:0;
 }
 
-/* Clouds Animation */
+/* Clouds */
 .clouds{
 
     position:absolute;
@@ -78,7 +78,47 @@ body{
     to{
         transform:translateX(-50%);
     }
+}
 
+/* Rain */
+.rain{
+
+    position:fixed;
+
+    width:100%;
+    height:100%;
+
+    top:0;
+    left:0;
+
+    overflow:hidden;
+
+    pointer-events:none;
+
+    z-index:1;
+}
+
+.drop{
+
+    position:absolute;
+
+    width:2px;
+    height:80px;
+
+    background:rgba(255,255,255,0.35);
+
+    animation:fall linear infinite;
+}
+
+@keyframes fall{
+
+    from{
+        transform:translateY(-100px);
+    }
+
+    to{
+        transform:translateY(100vh);
+    }
 }
 
 /* Main Card */
@@ -86,10 +126,10 @@ body{
 
     position:relative;
 
-    z-index:2;
+    z-index:5;
 
-    width:90%;
-    max-width:420px;
+    width:95%;
+    max-width:450px;
 
     padding:30px;
 
@@ -112,11 +152,9 @@ body{
 /* Header */
 .header h1{
 
-    font-size:2.2rem;
-
     margin-bottom:25px;
 
-    font-weight:700;
+    font-size:2rem;
 }
 
 /* Input */
@@ -124,7 +162,7 @@ body{
 
     width:100%;
 
-    padding:14px 18px;
+    padding:14px;
 
     border:none;
     outline:none;
@@ -138,18 +176,18 @@ body{
     font-size:1rem;
 
     text-align:center;
-
-    margin-bottom:20px;
 }
 
 .input-box::placeholder{
-    color:#e5e5e5;
+    color:#eee;
 }
 
 /* Weather Body */
 .weather-body{
 
     display:none;
+
+    margin-top:20px;
 
     background:rgba(0,0,0,0.18);
 
@@ -172,24 +210,20 @@ body{
     margin-top:5px;
 
     color:#ddd;
-
-    font-size:0.95rem;
 }
 
-/* Temperature */
+/* Temp */
 .temp{
 
     font-size:5rem;
 
-    font-weight:700;
-
-    margin:20px 0 10px;
+    margin:20px 0;
 }
 
 /* Weather */
 .weather{
 
-    font-size:1.6rem;
+    font-size:1.5rem;
 
     margin-bottom:10px;
 }
@@ -198,11 +232,9 @@ body{
 .min-max{
 
     margin-bottom:20px;
-
-    color:#ddd;
 }
 
-/* Details Grid */
+/* Details */
 .details{
 
     display:grid;
@@ -210,11 +242,9 @@ body{
     grid-template-columns:1fr 1fr;
 
     gap:15px;
-
-    margin-top:20px;
 }
 
-/* Detail Card */
+/* Cards */
 .card{
 
     background:rgba(255,255,255,0.1);
@@ -224,14 +254,40 @@ body{
     padding:15px;
 }
 
-.card i{
+/* Forecast */
+.forecast{
 
-    font-size:1.4rem;
+    margin-top:20px;
 
-    margin-bottom:8px;
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:10px;
 }
 
-/* Toggle Button */
+.forecast-card{
+
+    background:rgba(255,255,255,0.1);
+
+    border-radius:15px;
+
+    padding:10px;
+}
+
+/* Chart */
+#weatherChart{
+
+    margin-top:25px;
+
+    background:rgba(255,255,255,0.08);
+
+    border-radius:20px;
+
+    padding:10px;
+}
+
+/* Toggle */
 #theme-toggle{
 
     position:absolute;
@@ -252,12 +308,10 @@ body{
 
     cursor:pointer;
 
-    font-size:1rem;
-
-    z-index:5;
+    z-index:10;
 }
 
-/* Dark Mode */
+/* Dark */
 .dark{
 
     background:
@@ -269,21 +323,15 @@ body{
 }
 
 /* Mobile */
-@media(max-width:500px){
+@media(max-width:700px){
 
-    .app-main{
+    .forecast{
 
-        padding:20px;
+        grid-template-columns:repeat(2,1fr);
     }
 
     .temp{
 
         font-size:4rem;
     }
-
-    .header h1{
-
-        font-size:1.8rem;
-    }
-
 }
