@@ -1,337 +1,139 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+const weatherApi = {
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+    key: "df7dcacdc4ca9073762c2b558f681943",
 
-body{
+    baseUrl:
+    "https://api.openweathermap.org/data/2.5/weather"
+};
 
-    font-family:'Poppins',sans-serif;
+let inputBox =
+document.getElementById("input-box");
 
-    min-height:100vh;
+/* Search */
+inputBox.addEventListener("keypress",(event)=>{
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    if(event.key === "Enter"){
 
-    overflow-x:hidden;
+        getWeather(inputBox.value.trim());
 
-    background:
-    linear-gradient(
-        180deg,
-        #162a72 0%,
-        #3f2b96 50%,
-        #8e54e9 100%
-    );
-
-    transition:0.5s ease;
-
-    position:relative;
-}
-
-/* Overlay */
-.overlay{
-
-    position:absolute;
-
-    width:100%;
-    height:100%;
-
-    background:
-    radial-gradient(
-        circle at center,
-        rgba(255,255,255,0.08),
-        transparent 60%
-    );
-
-    z-index:0;
-}
-
-/* Clouds */
-.clouds{
-
-    position:absolute;
-
-    top:0;
-    left:0;
-
-    width:200%;
-    height:100%;
-
-    background:url("https://i.ibb.co/7rZz1kS/clouds.png") repeat-x;
-
-    opacity:0.12;
-
-    animation:moveClouds 90s linear infinite;
-
-    z-index:0;
-}
-
-@keyframes moveClouds{
-
-    from{
-        transform:translateX(0);
     }
 
-    to{
-        transform:translateX(-50%);
-    }
-}
+});
 
-/* Rain */
-.rain{
+/* Get Weather */
+function getWeather(city){
 
-    position:fixed;
+    if(city === ""){
 
-    width:100%;
-    height:100%;
+        swal(
+            "Empty Input",
+            "Please enter city",
+            "error"
+        );
 
-    top:0;
-    left:0;
-
-    overflow:hidden;
-
-    pointer-events:none;
-
-    z-index:1;
-}
-
-.drop{
-
-    position:absolute;
-
-    width:2px;
-    height:80px;
-
-    background:rgba(255,255,255,0.35);
-
-    animation:fall linear infinite;
-}
-
-@keyframes fall{
-
-    from{
-        transform:translateY(-100px);
+        return;
     }
 
-    to{
-        transform:translateY(100vh);
-    }
+    fetch(
+        `${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`
+    )
+
+    .then(response=>response.json())
+
+    .then(data=>{
+
+        if(data.cod != 200){
+
+            swal(
+                "Error",
+                data.message,
+                "error"
+            );
+
+            return;
+        }
+
+        showWeather(data);
+
+    });
+
 }
 
-/* Main Card */
-.app-main{
+/* Show Weather */
+function showWeather(weather){
 
-    position:relative;
+    let weatherBody =
+    document.getElementById("weather-body");
 
-    z-index:5;
+    weatherBody.style.display = "block";
 
-    width:95%;
-    max-width:450px;
+    weatherBody.innerHTML = `
 
-    padding:30px;
+        <div class="city">
+            ${weather.name}, ${weather.sys.country}
+        </div>
 
-    border-radius:30px;
+        <div class="temp">
+            ${Math.round(weather.main.temp)}°C
+        </div>
 
-    background:rgba(255,255,255,0.12);
+        <div class="weather">
+            ${weather.weather[0].main}
+        </div>
 
-    backdrop-filter:blur(20px);
+        <div class="details">
 
-    border:1px solid rgba(255,255,255,0.2);
+            <div class="card">
+                <h4>Humidity</h4>
+                <p>${weather.main.humidity}%</p>
+            </div>
 
-    box-shadow:
-    0 8px 32px rgba(0,0,0,0.35);
+            <div class="card">
+                <h4>Wind</h4>
+                <p>${weather.wind.speed} km/h</p>
+            </div>
 
-    color:white;
+        </div>
+    `;
 
-    text-align:center;
-}
-
-/* Header */
-.header h1{
-
-    margin-bottom:25px;
-
-    font-size:2rem;
-}
-
-/* Input */
-.input-box{
-
-    width:100%;
-
-    padding:14px;
-
-    border:none;
-    outline:none;
-
-    border-radius:15px;
-
-    background:rgba(255,255,255,0.15);
-
-    color:white;
-
-    font-size:1rem;
-
-    text-align:center;
-}
-
-.input-box::placeholder{
-    color:#eee;
-}
-
-/* Weather Body */
-.weather-body{
-
-    display:none;
-
-    margin-top:20px;
-
-    background:rgba(0,0,0,0.18);
-
-    border-radius:20px;
-
-    padding:25px;
-}
-
-/* City */
-.city{
-
-    font-size:2rem;
-
-    font-weight:600;
-}
-
-/* Date */
-.date{
-
-    margin-top:5px;
-
-    color:#ddd;
-}
-
-/* Temp */
-.temp{
-
-    font-size:5rem;
-
-    margin:20px 0;
-}
-
-/* Weather */
-.weather{
-
-    font-size:1.5rem;
-
-    margin-bottom:10px;
-}
-
-/* Min Max */
-.min-max{
-
-    margin-bottom:20px;
-}
-
-/* Details */
-.details{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:15px;
-}
-
-/* Cards */
-.card{
-
-    background:rgba(255,255,255,0.1);
-
-    border-radius:15px;
-
-    padding:15px;
-}
-
-/* Forecast */
-.forecast{
-
-    margin-top:20px;
-
-    display:grid;
-
-    grid-template-columns:repeat(5,1fr);
-
-    gap:10px;
-}
-
-.forecast-card{
-
-    background:rgba(255,255,255,0.1);
-
-    border-radius:15px;
-
-    padding:10px;
-}
-
-/* Chart */
-#weatherChart{
-
-    margin-top:25px;
-
-    background:rgba(255,255,255,0.08);
-
-    border-radius:20px;
-
-    padding:10px;
-}
-
-/* Toggle */
-#theme-toggle{
-
-    position:absolute;
-
-    top:20px;
-    right:20px;
-
-    width:45px;
-    height:45px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,0.15);
-
-    color:white;
-
-    cursor:pointer;
-
-    z-index:10;
-}
-
-/* Dark */
-.dark{
-
-    background:
-    linear-gradient(
-        180deg,
-        #0f0f0f,
-        #1e1e1e
+    changeBackground(
+        weather.weather[0].main
     );
 }
 
-/* Mobile */
-@media(max-width:700px){
+/* Background */
+function changeBackground(status){
 
-    .forecast{
+    let body = document.body;
 
-        grid-template-columns:repeat(2,1fr);
+    if(status === "Clear"){
+
+        body.style.backgroundImage =
+        "url('images/clear.jpg')";
     }
 
-    .temp{
+    else if(status === "Clouds"){
 
-        font-size:4rem;
+        body.style.backgroundImage =
+        "url('images/clouds.jpg')";
     }
+
+    else if(status === "Rain"){
+
+        body.style.backgroundImage =
+        "url('images/rain.jpg')";
+    }
+
+    else if(status === "Snow"){
+
+        body.style.backgroundImage =
+        "url('images/snow.jpg')";
+    }
+
+    else{
+
+        body.style.backgroundImage =
+        "url('images/bg.jpg')";
+    }
+
 }
