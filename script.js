@@ -1,11 +1,15 @@
-const weatherApi = {
+// script.js
 
-    key: 'YOUR_API_KEY',
+const weatherApi = {
+ key: 'df7dcacdc4ca9073762c2b558f681943',
 
     baseUrl: 'https://api.openweathermap.org/data/2.5/weather',
 
     forecastUrl: 'https://api.openweathermap.org/data/2.5/forecast'
 };
+
+
+// Elements
 
 const inputBox = document.getElementById('input-box');
 
@@ -18,7 +22,7 @@ const forecastContainer = document.getElementById('forecast');
 const loader = document.getElementById('loader');
 
 
-// Enter Key
+// Enter Key Search
 
 inputBox.addEventListener('keypress', (e)=>{
 
@@ -29,7 +33,7 @@ inputBox.addEventListener('keypress', (e)=>{
 });
 
 
-// Search Button
+// Button Search
 
 searchBtn.addEventListener('click', ()=>{
 
@@ -77,7 +81,7 @@ function getWeather(city){
 }
 
 
-// Show Weather
+// Show Current Weather
 
 function showWeather(weather){
 
@@ -90,9 +94,13 @@ function showWeather(weather){
 
     weatherBody.style.display = "block";
 
-    let sunrise = new Date(weather.sys.sunrise * 1000).toLocaleTimeString();
+    let sunrise =
+        new Date(weather.sys.sunrise * 1000)
+        .toLocaleTimeString();
 
-    let sunset = new Date(weather.sys.sunset * 1000).toLocaleTimeString();
+    let sunset =
+        new Date(weather.sys.sunset * 1000)
+        .toLocaleTimeString();
 
     weatherBody.innerHTML = `
 
@@ -192,9 +200,11 @@ function showForecast(data){
 
     forecastData.forEach(item => {
 
-        let day = new Date(item.dt_txt).toLocaleDateString('en-US',{
-            weekday:'short'
-        });
+        let day =
+            new Date(item.dt_txt)
+            .toLocaleDateString('en-US',{
+                weekday:'short'
+            });
 
         forecastContainer.innerHTML += `
 
@@ -221,36 +231,50 @@ function changeBg(status){
     if(status === 'Clouds'){
 
         document.body.style.backgroundImage =
-        'url(img/clouds.jpg)';
+        "url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=2070&auto=format&fit=crop')";
     }
 
     else if(status === 'Rain'){
 
         document.body.style.backgroundImage =
-        'url(img/rainy.jpg)';
+        "url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2070&auto=format&fit=crop')";
     }
 
     else if(status === 'Clear'){
 
         document.body.style.backgroundImage =
-        'url(img/clear.jpg)';
+        "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop')";
     }
 
     else if(status === 'Snow'){
 
         document.body.style.backgroundImage =
-        'url(img/snow.jpg)';
+        "url('https://images.unsplash.com/photo-1516431883659-655d41c09bf9?q=80&w=2070&auto=format&fit=crop')";
     }
 
     else if(status === 'Thunderstorm'){
 
         document.body.style.backgroundImage =
-        'url(img/thunderstorm.jpg)';
+        "url('https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?q=80&w=2070&auto=format&fit=crop')";
+    }
+
+    else if(
+        status === 'Mist' ||
+        status === 'Fog' ||
+        status === 'Haze'
+    ){
+
+        document.body.style.backgroundImage =
+        "url('https://images.unsplash.com/photo-1485236715568-ddc5ee6ca227?q=80&w=2070&auto=format&fit=crop')";
     }
 
     else{
 
         document.body.style.backgroundImage =
-        'url(img/bg1.jpg)';
+        "url('https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=2070&auto=format&fit=crop')";
     }
+
+    document.body.style.backgroundSize = "cover";
+
+    document.body.style.backgroundPosition = "center";
 }
