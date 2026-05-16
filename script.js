@@ -1,3 +1,5 @@
+// script.js
+
 // Weather API
 
 const weatherApi = {
@@ -23,9 +25,11 @@ searchInputBox.addEventListener('keypress', (event) => {
 });
 
 
-// Get Current Weather + Forecast
+// Get Weather
 
 function getWeatherReport(city) {
+
+    // Current Weather
 
     fetch(`${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
 
@@ -33,7 +37,14 @@ function getWeatherReport(city) {
 
         .then(showWeaterReport);
 
-    getForecast(city);
+
+    // Forecast
+
+    fetch(`${weatherApi.forecastUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
+
+        .then(response => response.json())
+
+        .then(showForecast);
 }
 
 
@@ -48,7 +59,6 @@ function showWeaterReport(weather) {
         swal("Empty Input", "Please enter city name", "error");
 
         reset();
-
     }
 
     else if (city_code === '404') {
@@ -71,11 +81,15 @@ function showWeaterReport(weather) {
         <div class="location-deatils">
 
             <div class="city">
+
                 ${weather.name}, ${weather.sys.country}
+
             </div>
 
             <div class="date">
+
                 ${dateManage(todayDate)}
+
             </div>
 
         </div>
@@ -83,21 +97,30 @@ function showWeaterReport(weather) {
         <div class="weather-status">
 
             <div class="temp">
-                ${Math.round(weather.main.temp)}&deg;C
+
+                ${Math.round(weather.main.temp)}°C
+
             </div>
 
             <div class="weather">
+
                 ${weather.weather[0].main}
+
                 <i class="${getIconClass(weather.weather[0].main)}"></i>
+
             </div>
 
             <div class="min-max">
-                ${Math.floor(weather.main.temp_min)}&deg;C (min) /
-                ${Math.ceil(weather.main.temp_max)}&deg;C (max)
+
+                ${Math.floor(weather.main.temp_min)}°C (min) /
+                ${Math.ceil(weather.main.temp_max)}°C (max)
+
             </div>
 
             <div id="updated_on">
+
                 Updated as of ${getTime(todayDate)}
+
             </div>
 
         </div>
@@ -108,7 +131,7 @@ function showWeaterReport(weather) {
 
             <div class="basic">
 
-                Feels like ${weather.main.feels_like}&deg;C |
+                Feels like ${weather.main.feels_like}°C |
 
                 Humidity ${weather.main.humidity}% <br>
 
@@ -130,29 +153,17 @@ function showWeaterReport(weather) {
 
 // Forecast Function
 
-function getForecast(city) {
-
-    fetch(`${weatherApi.forecastUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
-
-        .then(response => response.json())
-
-        .then(data => showForecast(data));
-}
-
-
-// Show Forecast
-
 function showForecast(data) {
 
-    let forecastContainer = document.getElementById("forecast");
+    let forecastContainer = document.getElementById('forecast');
 
     forecastContainer.innerHTML = "";
 
-    let forecastList = data.list.filter(item =>
+    let forecastData = data.list.filter(item =>
         item.dt_txt.includes("12:00:00")
     );
 
-    forecastList.forEach(item => {
+    forecastData.forEach(item => {
 
         let date = new Date(item.dt_txt);
 
@@ -166,7 +177,7 @@ function showForecast(data) {
 
         let weather = item.weather[0].main;
 
-        let card = `
+        let forecastCard = `
 
         <div class="forecast-card">
 
@@ -174,14 +185,14 @@ function showForecast(data) {
 
             <img src="https://openweathermap.org/img/wn/${icon}@2x.png">
 
-            <p>${temp}&deg;C</p>
+            <p>${temp}°C</p>
 
             <p>${weather}</p>
 
         </div>
         `;
 
-        forecastContainer.innerHTML += card;
+        forecastContainer.innerHTML += forecastCard;
     });
 }
 
@@ -247,7 +258,6 @@ function changeBg(status) {
 
         document.body.style.backgroundImage =
             'url(img/clouds.jpg)';
-
     }
 
     else if (status === 'Rain') {
@@ -268,12 +278,6 @@ function changeBg(status) {
             'url(img/snow.jpg)';
     }
 
-    else if (status === 'Sunny') {
-
-        document.body.style.backgroundImage =
-            'url(img/sunny.jpg)';
-    }
-
     else if (status === 'Thunderstorm') {
 
         document.body.style.backgroundImage =
@@ -282,8 +286,8 @@ function changeBg(status) {
 
     else if (
         status === 'Mist' ||
-        status === 'Haze' ||
-        status === 'Fog'
+        status === 'Fog' ||
+        status === 'Haze'
     ) {
 
         document.body.style.backgroundImage =
@@ -322,17 +326,17 @@ function getIconClass(classarg) {
         return 'fas fa-snowflake';
     }
 
-    else if (classarg === 'Mist') {
-
-        return 'fas fa-smog';
-    }
-
     else if (
         classarg === 'Thunderstorm' ||
         classarg === 'Drizzle'
     ) {
 
         return 'fas fa-bolt';
+    }
+
+    else if (classarg === 'Mist') {
+
+        return 'fas fa-smog';
     }
 
     else {
