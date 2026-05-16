@@ -1,163 +1,190 @@
-// script.js
-
-// Weather API
-
 const weatherApi = {
 
-    key: '4eb3703790b356562054106543b748b2',
+    key: 'YOUR_API_KEY',
 
     baseUrl: 'https://api.openweathermap.org/data/2.5/weather',
 
     forecastUrl: 'https://api.openweathermap.org/data/2.5/forecast'
 };
 
+const inputBox = document.getElementById('input-box');
 
-// Enter Key Search
+const searchBtn = document.getElementById('search-btn');
 
-let searchInputBox = document.getElementById('input-box');
+const weatherBody = document.getElementById('weather-body');
 
-searchInputBox.addEventListener('keypress', (event) => {
+const forecastContainer = document.getElementById('forecast');
 
-    if (event.key === 'Enter') {
+const loader = document.getElementById('loader');
 
-        getWeatherReport(searchInputBox.value);
+
+// Enter Key
+
+inputBox.addEventListener('keypress', (e)=>{
+
+    if(e.key === 'Enter'){
+
+        getWeather(inputBox.value);
     }
 });
 
 
-// Get Weather
+// Search Button
 
-function getWeatherReport(city) {
+searchBtn.addEventListener('click', ()=>{
+
+    getWeather(inputBox.value);
+});
+
+
+// Main Function
+
+function getWeather(city){
+
+    if(city === ""){
+
+        swal("Empty Input","Please enter city name","error");
+
+        return;
+    }
+
+    loader.style.display = "block";
 
     // Current Weather
 
     fetch(`${weatherApi.baseUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
 
-        .then(response => response.json())
+    .then(response => response.json())
 
-        .then(showWeaterReport);
+    .then(data => {
+
+        showWeather(data);
+
+        loader.style.display = "none";
+    });
 
 
     // Forecast
 
     fetch(`${weatherApi.forecastUrl}?q=${city}&appid=${weatherApi.key}&units=metric`)
 
-        .then(response => response.json())
+    .then(response => response.json())
 
-        .then(showForecast);
+    .then(data => {
+
+        showForecast(data);
+    });
 }
 
 
-// Show Current Weather
+// Show Weather
 
-function showWeaterReport(weather) {
+function showWeather(weather){
 
-    let city_code = weather.cod;
+    if(weather.cod == "404"){
 
-    if (city_code === '400') {
+        swal("City Not Found","Enter correct city","warning");
 
-        swal("Empty Input", "Please enter city name", "error");
-
-        reset();
+        return;
     }
 
-    else if (city_code === '404') {
+    weatherBody.style.display = "block";
 
-        swal("City Not Found", "Please enter correct city", "warning");
+    let sunrise = new Date(weather.sys.sunrise * 1000).toLocaleTimeString();
 
-        reset();
-    }
+    let sunset = new Date(weather.sys.sunset * 1000).toLocaleTimeString();
 
-    else {
+    weatherBody.innerHTML = `
 
-        let weather_body = document.getElementById('weather-body');
+    <div class="weather-icon">
 
-        weather_body.style.display = 'block';
+        <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png">
 
-        let todayDate = new Date();
+    </div>
 
-        weather_body.innerHTML = `
+    <h2>${weather.name}, ${weather.sys.country}</h2>
 
-        <div class="location-deatils">
+    <div class="temp">
 
-            <div class="city">
+        ${Math.round(weather.main.temp)}°C
 
-                ${weather.name}, ${weather.sys.country}
+    </div>
 
-            </div>
+    <div class="weather">
 
-            <div class="date">
+        ${weather.weather[0].main}
 
-                ${dateManage(todayDate)}
+    </div>
 
-            </div>
+    <div class="details">
+
+        <div class="card">
+
+            <h3>Humidity</h3>
+
+            <p>${weather.main.humidity}%</p>
 
         </div>
 
-        <div class="weather-status">
+        <div class="card">
 
-            <div class="temp">
+            <h3>Wind</h3>
 
-                ${Math.round(weather.main.temp)}°C
-
-            </div>
-
-            <div class="weather">
-
-                ${weather.weather[0].main}
-
-                <i class="${getIconClass(weather.weather[0].main)}"></i>
-
-            </div>
-
-            <div class="min-max">
-
-                ${Math.floor(weather.main.temp_min)}°C (min) /
-                ${Math.ceil(weather.main.temp_max)}°C (max)
-
-            </div>
-
-            <div id="updated_on">
-
-                Updated as of ${getTime(todayDate)}
-
-            </div>
+            <p>${weather.wind.speed} KM/H</p>
 
         </div>
 
-        <hr>
+        <div class="card">
 
-        <div class="day-details">
+            <h3>Pressure</h3>
 
-            <div class="basic">
-
-                Feels like ${weather.main.feels_like}°C |
-
-                Humidity ${weather.main.humidity}% <br>
-
-                Pressure ${weather.main.pressure} mb |
-
-                Wind ${weather.wind.speed} KM/H
-
-            </div>
+            <p>${weather.main.pressure} mb</p>
 
         </div>
-        `;
 
-        changeBg(weather.weather[0].main);
+        <div class="card">
 
-        reset();
-    }
+            <h3>Feels Like</h3>
+
+            <p>${weather.main.feels_like}°C</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Sunrise</h3>
+
+            <p>${sunrise}</p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Sunset</h3>
+
+            <p>${sunset}</p>
+
+        </div>
+
+    </div>
+    `;
+
+    changeBg(weather.weather[0].main);
+
+    inputBox.value = "";
 }
 
 
-// Forecast Function
+// Forecast
 
-function showForecast(data) {
-
-    let forecastContainer = document.getElementById('forecast');
+function showForecast(data){
 
     forecastContainer.innerHTML = "";
+
+    if(!data.list){
+
+        return;
+    }
 
     let forecastData = data.list.filter(item =>
         item.dt_txt.includes("12:00:00")
@@ -165,203 +192,65 @@ function showForecast(data) {
 
     forecastData.forEach(item => {
 
-        let date = new Date(item.dt_txt);
-
-        let day = date.toLocaleDateString('en-US', {
-            weekday: 'short'
+        let day = new Date(item.dt_txt).toLocaleDateString('en-US',{
+            weekday:'short'
         });
 
-        let icon = item.weather[0].icon;
-
-        let temp = Math.round(item.main.temp);
-
-        let weather = item.weather[0].main;
-
-        let forecastCard = `
+        forecastContainer.innerHTML += `
 
         <div class="forecast-card">
 
             <h3>${day}</h3>
 
-            <img src="https://openweathermap.org/img/wn/${icon}@2x.png">
+            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png">
 
-            <p>${temp}°C</p>
+            <p>${Math.round(item.main.temp)}°C</p>
 
-            <p>${weather}</p>
+            <p>${item.weather[0].main}</p>
 
         </div>
         `;
-
-        forecastContainer.innerHTML += forecastCard;
     });
-}
-
-
-// Time Function
-
-function getTime(todayDate) {
-
-    let hour = addZero(todayDate.getHours());
-
-    let minute = addZero(todayDate.getMinutes());
-
-    return `${hour}:${minute}`;
-}
-
-
-// Date Function
-
-function dateManage(dateArg) {
-
-    let days = [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday'
-    ];
-
-    let months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-    ];
-
-    let year = dateArg.getFullYear();
-
-    let month = months[dateArg.getMonth()];
-
-    let date = dateArg.getDate();
-
-    let day = days[dateArg.getDay()];
-
-    return `${date} ${month} (${day}), ${year}`;
 }
 
 
 // Dynamic Background
 
-function changeBg(status) {
+function changeBg(status){
 
-    if (status === 'Clouds') {
-
-        document.body.style.backgroundImage =
-            'url(img/clouds.jpg)';
-    }
-
-    else if (status === 'Rain') {
+    if(status === 'Clouds'){
 
         document.body.style.backgroundImage =
-            'url(img/rainy.jpg)';
+        'url(img/clouds.jpg)';
     }
 
-    else if (status === 'Clear') {
+    else if(status === 'Rain'){
 
         document.body.style.backgroundImage =
-            'url(img/clear.jpg)';
+        'url(img/rainy.jpg)';
     }
 
-    else if (status === 'Snow') {
+    else if(status === 'Clear'){
 
         document.body.style.backgroundImage =
-            'url(img/snow.jpg)';
+        'url(img/clear.jpg)';
     }
 
-    else if (status === 'Thunderstorm') {
+    else if(status === 'Snow'){
 
         document.body.style.backgroundImage =
-            'url(img/thunderstorm.jpg)';
+        'url(img/snow.jpg)';
     }
 
-    else if (
-        status === 'Mist' ||
-        status === 'Fog' ||
-        status === 'Haze'
-    ) {
+    else if(status === 'Thunderstorm'){
 
         document.body.style.backgroundImage =
-            'url(img/mist.jpg)';
+        'url(img/thunderstorm.jpg)';
     }
 
-    else {
+    else{
 
         document.body.style.backgroundImage =
-            'url(img/bg1.jpg)';
+        'url(img/bg1.jpg)';
     }
-}
-
-
-// Weather Icons
-
-function getIconClass(classarg) {
-
-    if (classarg === 'Rain') {
-
-        return 'fas fa-cloud-showers-heavy';
-    }
-
-    else if (classarg === 'Clouds') {
-
-        return 'fas fa-cloud';
-    }
-
-    else if (classarg === 'Clear') {
-
-        return 'fas fa-sun';
-    }
-
-    else if (classarg === 'Snow') {
-
-        return 'fas fa-snowflake';
-    }
-
-    else if (
-        classarg === 'Thunderstorm' ||
-        classarg === 'Drizzle'
-    ) {
-
-        return 'fas fa-bolt';
-    }
-
-    else if (classarg === 'Mist') {
-
-        return 'fas fa-smog';
-    }
-
-    else {
-
-        return 'fas fa-cloud-sun';
-    }
-}
-
-
-// Reset Input
-
-function reset() {
-
-    document.getElementById('input-box').value = "";
-}
-
-
-// Add Zero
-
-function addZero(i) {
-
-    if (i < 10) {
-
-        i = "0" + i;
-    }
-
-    return i;
 }
