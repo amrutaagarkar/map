@@ -105,4 +105,12 @@ body: `${data.location.name} is ${data.current.temp_c}°C`
 }
 
 // AUTO LOAD DEFAULT
-getWeather("Mumbai");
+document.addEventListener("DOMContentLoaded", function () {
+
+const apiKey = "9b14b2cbfdfa41f6b63172731261605";
+
+const cityInput = document.getElementById("city");
+
+console.log(cityInput);
+
+});
