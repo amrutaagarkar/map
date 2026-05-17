@@ -58,24 +58,151 @@ map.removeLayer(marker);
 marker = L.marker([lat, lon]).addTo(map);
 map.setView([lat, lon], 10);
 }
+const weatherIcons = forecast.map(d => "https:" + d.day.condition.icon);
 
-// CHART
-function loadChart(days){
+Chart.register({
+id: 'weatherIcons',
+afterDatasetsDraw(chart) {
 
-let labels = days.map(d => d.date);
-let temps = days.map(d => d.day.avgtemp_c);
+const { ctx } = chart;
 
-new Chart(document.getElementById("chart"), {
-type: 'line',
-data: {
-labels: labels,
-datasets: [{
-label: 'Temperature',
-data: temps,
-borderColor: 'yellow'
-}]
+chart.getDatasetMeta(0).data.forEach((point, i) => {
+
+const img = new Image();
+img.src = weatherIcons[i];
+
+ctx.drawImage(img, point.x - 12, point.y - 40, 25, 25);
+
+});
+
 }
 });
+
+// CHART
+function createChart(forecast){
+
+const labels = forecast.map(day =>
+new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })
+);
+
+const tempData = forecast.map(day => day.day.avgtemp_c);
+const humidityData = forecast.map(day => day.day.avghumidity);
+const rainData = forecast.map(day => day.day.daily_chance_of_rain);
+const icons = forecast.map(day => "https:" + day.day.condition.icon);
+
+const ctx = document.getElementById("tempChart");
+
+new Chart(ctx, {
+
+type: 'line',
+
+data: {
+
+labels: labels,
+
+datasets: [
+
+{
+label: 'Temperature (°C)',
+data: tempData,
+borderColor: '#ff6384',
+backgroundColor: 'rgba(255,99,132,0.2)',
+tension: 0.4,
+fill: true,
+pointRadius: 6,
+pointHoverRadius: 10,
+pointBackgroundColor: '#fff'
+},
+
+{
+label: 'Humidity (%)',
+data: humidityData,
+borderColor: '#36a2eb',
+backgroundColor: 'rgba(54,162,235,0.2)',
+tension: 0.4,
+fill: true,
+pointRadius: 6,
+pointHoverRadius: 10
+},
+
+{
+label: 'Rain Chance (%)',
+data: rainData,
+borderColor: '#4bc0c0',
+backgroundColor: 'rgba(75,192,192,0.2)',
+tension: 0.4,
+fill: true,
+pointRadius: 6,
+pointHoverRadius: 10
+}
+
+]
+
+},
+
+options: {
+
+responsive: true,
+
+interaction: {
+mode: 'index',
+intersect: false
+},
+
+plugins: {
+
+legend: {
+labels: {
+color: "white"
+}
+},
+
+tooltip: {
+
+callbacks: {
+
+afterLabel: function(context){
+
+let i = context.dataIndex;
+return "Condition: " + forecast[i].day.condition.text;
+
+}
+
+}
+
+}
+
+},
+
+scales: {
+
+x: {
+ticks: { color: "white" }
+},
+
+y: {
+ticks: { color: "white" }
+}
+
+},
+
+elements: {
+point: {
+
+pointStyle: function(context){
+
+// WEATHER ICONS ON POINTS
+return new Image().src = icons[context.dataIndex];
+
+}
+
+}
+}
+
+}
+
+});
+
 }
 
 // FAVORITES
