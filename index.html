@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pro Weather App</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>🌤 Pro Weather App</h1>
+
+<input id="city" placeholder="Enter city">
+
+<div class="buttons">
+
+<button onclick="getWeather()">Search</button>
+
+<button onclick="getLocation()">📍 My Location</button>
+
+<button onclick="addFavorite()">⭐ Favorite</button>
+
+</div>
+
+<div id="weather"></div>
+
+<div id="map"></div>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+// Service Worker (PWA)
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
